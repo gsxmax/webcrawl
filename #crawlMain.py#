@@ -92,7 +92,7 @@ if __name__  ==  '__main__':
     sys.setdefaultencoding('utf-8')
     
     # url = 'http://cl.clus.pw/htm_data/7/1512/1774220.html'
-    url = "http://cl.clus.pw/thread0806.php?fid=7"
+    url = ""
     urlcoding = 'gbk'
     r = getHtmlResponse(url)
     r.encoding = urlcoding
