@@ -1,0 +1,66 @@
+
+# -*-  coding=utf8  -*-
+import  requests,sys
+from bs4 import BeautifulSoup
+from PIL import Image 
+from StringIO import StringIO
+
+
+def  getHtmlResponse(url):
+    rel = requests.get(url)
+    return rel
+
+def  writeContentToFile(filename,str):
+    with open(filename,"w") as f:
+        f.write(str)
+    return True
+
+def  createImageFromUrls(urls,path):
+    while  urls:
+        url = urls.pop()
+        res = getHtmlResponse(url)
+        im = Image.open(StringIO(res.content))
+        import re
+        filenames = re.split("/|//", url)
+        osfile =  path + filenames.pop()
+        print "osfile", osfile
+        if im.save(osfile) is not None:
+            print 'picture %s is generated successful!', url
+        else:
+            print 'picture %s could not be generated ', url
+    return True
+                
+        
+    
+
+
+if __name__  ==  '__main__':
+    print "hello webCrawl."
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+    
+    url = 'http://cl.clus.pw/htm_data/7/1512/1774220.html'
+    urlcoding = 'gbk'
+    r = getHtmlResponse(url)
+    r.encoding = urlcoding
+
+    print type(r.text)
+    
+    soup_html = BeautifulSoup(r.text,'html.parser')
+    img_urls = []
+    soup_html.find_all('img')
+    for img_src in   soup_html.find_all('img'):
+        img_urls.append(img_src['src'])
+    
+    writeContentToFile("study.html",r.text.encode('gbk'))
+    img_path =  '/home/beyondkoma/work/gitProject/webCrawl/images/'
+
+    createImageFromUrls(img_urls,img_path)
+    
+    
+    # i = Image.open(StringIO(r.content)) # image
+    # r.json()                    # json
+    
+
+    
+
