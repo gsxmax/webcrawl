@@ -64,7 +64,6 @@ def downImageFromUrls(urls, path):
                 return True
         return True
 
-
 def makeUrlFromHref(valueurl, currenturl, defaulturl=""):
     """
 
