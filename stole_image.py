@@ -15,10 +15,10 @@ def downImageFromUrl(url, path):
                         f.write(chunk)
         else:
                 return False
-    except requests.exceptions as e:
+    except requests.RequestException:
         print('requests is exceptions when downImage.', url)
         return False
-    except Exception as e:
+    except Exception:
         print('ordinary exception', url)
         return False
     return True
@@ -31,7 +31,7 @@ def get_image(base_num):
     for a in guess_chs:
         for b in guess_chs:
             for c in guess_chs:
-                guess_url = base_url + '{:0>3}_{}{}{}'.format(str(base_num), a, b, c)
+                guess_url = base_url + '{:0>3}_{}{}{}.jpg'.format(str(base_num), a, b, c)
                 if downImageFromUrl(guess_url, img_path):
                     return True
     return False
@@ -40,8 +40,8 @@ def get_image(base_num):
 def stole_image():
     base_num, total_img = 1, 50
     for _ in range(total_img):
-        base_num += 1
         get_image(base_num)
+        base_num += 1
 
 if __name__ == '__main__':
         stole_image()
