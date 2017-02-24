@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from collections import deque
 import time
 import re
-import sys
+
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:46.0) Gecko/20100101 Firefox/46.0',
