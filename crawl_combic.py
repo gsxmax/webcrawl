@@ -9,10 +9,10 @@ import re
 file_path = "/home/beyondkoma/work/gitProject/webCrawl/images/test.html"
 
 
-r = requests.post("http://v.comicbus.com/online/comic-103.html?ch=1", data={'id': 'next'})
-r.encoding = 'big5'
-with open(file_path, "w") as f:
-        f.write(r.text)
+# r = requests.post("http://v.comicbus.com/online/comic-103.html?ch=1", data={'id': 'next'})
+# r.encoding = 'big5'
+# with open(file_path, "w") as f:
+#         f.write(r.text)
 img_src_task = []
 
 
