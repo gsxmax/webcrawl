@@ -1,34 +1,41 @@
+# coding=utf-8
 import requests
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
 from bs4 import BeautifulSoup
+
+import time
 import os
 import re
-
+from multiprocessing import Process, Queue
 
 file_path = "/home/beyondkoma/work/gitProject/webCrawl/images/test.html"
+base_url = "http://v.comicbus.com/online/comic-9401.html?ch=45"
+dst_path = "D:/images/"
 
-
-# r = requests.post("http://v.comicbus.com/online/comic-103.html?ch=1", data={'id': 'next'})
-# r.encoding = 'big5'
-# with open(file_path, "w") as f:
-#         f.write(r.text)
-img_src_task = []
+img_url_tasks = Queue()
 
 
 def init_web_engine():
     driver = webdriver.PhantomJS()
-    base_url = "http://v.comicbus.com/online/comic-103.html?ch=1"
-    dst_path = "/home/beyondkoma/work/gitProject/webCrawl/images/"
-    page = 103
+    return driver
+
+
+def gen_img_url_task(webdriver):
+    page = 26
     for num in range(1, page+1):
         if num != 1:
             new_url = base_url + '-' + str(num)
+        if num = page+1
+            print("All done!")
+            break
         else:
             new_url = base_url
-        img_src_task.append(get_imgsrc_by_render(new_url, driver))
-        down_img_by_url(img_src_task.pop(), dst_path)
-    driver.quit()
+        img_url = get_imgsrc_by_render(new_url, webdriver)
+        if img_url:
+            img_url_tasks.put(img_url)
+            print("get img url {}, current process is {}, the parent process is {}".format(img_url, os.getpid(), os.getppid()))
+    return
 
 
 def get_imgsrc_by_render(url,  webdriver):
@@ -43,8 +50,11 @@ def get_imgsrc_by_render(url,  webdriver):
         # print(webdriver.page_source)
         for img_src in soup_html.find_all('img'):
             if 'name' in img_src.attrs and img_src['name'] == 'TheImg':
-                print(img_src['src'])
-                return img_src['src']
+                if 'src' in img_src.attrs:
+                    print(img_src['src'])
+                    return img_src['src']
+                else:
+                    return None
                 with open(file_path, "w") as f:
                     f.write(webdriver.page_source)
 
@@ -58,11 +68,12 @@ def down_img_by_url(url, dst_path):
     try:
         rel = requests.get(url, stream=True, verify=False)
         if rel.status_code == 200:
-                print("down image is {0}. ". format(url))
                 with open(osfile, 'wb') as f:
                     for chunk in rel.iter_content(1024):
                         f.write(chunk)
+                print("down image:{0} is finished, the path is{1}. ". format(url, dst_path))
         else:
+                print("down image:{0} has failured. ". format(url))
                 return False
     except requests.RequestException:
         print('requests is exceptions when downImage.', url)
@@ -73,5 +84,20 @@ def down_img_by_url(url, dst_path):
     return True
 
 
+def down_worker(img_url_tasks):
+    print("current process is {}, the parent process is {}".format(os.getpid(), os.getppid()))
+    while True:
+        print("current total img urls is {}".format(img_url_tasks.qsize()))
+        img_url = img_url_tasks.get()
+        down_img_by_url(img_url, dst_path)
+        if img_url_tasks.empty():
+            time.sleep(5)
+
+
 if __name__ == '__main__':
-    init_web_engine()
+    driver = init_web_engine()
+    worker = Process(target=down_worker, args=(img_url_tasks,))
+    worker.start()
+    gen_img_url_task(driver)
+    driver.quit()
+    worker.join()
