@@ -98,8 +98,8 @@ def down_worker(img_url_tasks):
 
 if __name__ == '__main__':
     driver = init_web_engine()
-    down_worker = Process(target=down_worker, args=(img_url_tasks,))
-    down_worker.start()
+    worker = Process(target=down_worker, args=(img_url_tasks,))
+    worker.start()
     gen_img_url_task(driver)
     driver.quit()
-    down_worker.join()
+    worker.join()
